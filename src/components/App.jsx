@@ -4,8 +4,20 @@ import ContactForm from './ContactForm/ContactForm';
 import ContactList from './ContactList/ContactList';
 import Filter from './Filter/Filter';
 
+const useLocalStorage = (contacts, defaultValue) => {
+  const [state, setState] = useState(() => {
+    return JSON.parse(window.localStorage.getItem(contacts)) ?? defaultValue;
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem(contacts, JSON.stringify(state));
+  }, [contacts, state]);
+
+  return [state, setState];
+};
+
 export default function App() {
-  const [contacts, setContacts] = useState([
+  const [contacts, setContacts] = useLocalStorage('contacts', [
     { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
     { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
     { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
@@ -15,12 +27,6 @@ export default function App() {
   const [filter, setFilter] = useState('');
 
   const addContact = ({ name, number }) => {
-    const newContact = {
-      id: nanoid(),
-      name,
-      number,
-    };
-
     const checkedContact = (name, number) => {
       return contacts.find(
         contact =>
@@ -34,26 +40,30 @@ export default function App() {
       return;
     }
 
-    setContacts(() => ({
-      contacts: [newContact, ...contacts],
-    }));
-  };
-
-  const deleteContact = id => {
-    setContacts(() => {
-      return { contacts: contacts.filter(contact => contact.id !== id) };
+    setContacts(contacts => {
+      const newContact = {
+        id: nanoid(),
+        name,
+        number,
+      };
+      return [newContact, ...contacts];
     });
   };
 
+  const deleteContact = id => {
+    setContacts(contacts.filter(contact => contact.id !== id));
+  };
+
   const changeFilter = e => {
-    setFilter({ filter: e.currentTarget.value });
+    setFilter(e.currentTarget.value);
   };
 
   const getFilteredContacts = () => {
     const normalizedFilter = filter.toLowerCase();
-    return contacts.filter(contact =>
-      contact.name.toLowerCase().trim().includes(normalizedFilter)
-    );
+    const filteredContacts = contacts.filter(contact => {
+      return contact.name.toLowerCase().trim().includes(normalizedFilter);
+    });
+    return filteredContacts;
   };
 
   // componentDidUpdate(prevProps, prevState) {
@@ -70,17 +80,6 @@ export default function App() {
   //   }
   // }
 
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
-
-  useEffect(() => {
-    const contacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(contacts);
-    setContacts({ contacts: parsedContacts });
-  }, [contacts]);
-
-  const filteredContacts = getFilteredContacts;
   return (
     <div>
       <div
@@ -113,7 +112,7 @@ export default function App() {
       >
         <h2 style={{ marginBottom: '20px' }}>Contacts</h2>
         <Filter value={filter} onChange={changeFilter} />
-        <ContactList contacts={filteredContacts} onClick={deleteContact} />
+        <ContactList contacts={getFilteredContacts()} onClick={deleteContact} />
       </div>
     </div>
   );
