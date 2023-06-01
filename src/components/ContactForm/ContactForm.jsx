@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import css from './ContactForm.module.css';
 
 export default function ContactForm({ onSubmit }) {
-  console.log(onSubmit);
-
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 

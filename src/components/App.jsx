@@ -1,20 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import useLocalStorage from './hooks/useLocalStorage';
 import { nanoid } from 'nanoid';
 import ContactForm from './ContactForm/ContactForm';
 import ContactList from './ContactList/ContactList';
 import Filter from './Filter/Filter';
-
-const useLocalStorage = (contacts, defaultValue) => {
-  const [state, setState] = useState(() => {
-    return JSON.parse(window.localStorage.getItem(contacts)) ?? defaultValue;
-  });
-
-  useEffect(() => {
-    window.localStorage.setItem(contacts, JSON.stringify(state));
-  }, [contacts, state]);
-
-  return [state, setState];
-};
 
 export default function App() {
   const [contacts, setContacts] = useLocalStorage('contacts', [
@@ -65,20 +54,6 @@ export default function App() {
     });
     return filteredContacts;
   };
-
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (this.state.contacts !== prevState.contacts) {
-  //     localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-  //   }
-  // }
-
-  // componentDidMount() {
-  //   const contacts = localStorage.getItem('contacts');
-  //   const parsedContacts = JSON.parse(contacts);
-  //   if (parsedContacts) {
-  //     this.setState({ contacts: parsedContacts });
-  //   }
-  // }
 
   return (
     <div>

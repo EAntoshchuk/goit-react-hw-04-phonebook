@@ -3,7 +3,7 @@ import css from './Filter.module.css';
 
 const Filter = ({ value, onChange }) => (
   <label className={css.filter_label}>
-    <div className={css.filter_title}>Filter by contact</div>
+    <div className={css.filter_title}>Filter by contact name</div>
     <input
       className={css.filter_input}
       type="text"
